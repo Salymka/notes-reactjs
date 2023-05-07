@@ -8,7 +8,7 @@ import searchIcon from '../../static/search-icon.png'
 import {NotesContext} from "../../notesContext";
 
 const ToolBar = () => {
-    const {currentNoteId, setIsEditMode, setNotes, setCurrentNoteId} = useContext(NotesContext)
+    const {currentNoteId, notes, setIsEditMode, setNotes, setCurrentNoteId, setSearchString, searchString} = useContext(NotesContext)
     const editModeHandler = () => {
         setIsEditMode(true)
     }
@@ -25,14 +25,17 @@ const ToolBar = () => {
 
 
     const addNewNote = () => {
-        let noteId
-        setNotes((notes) => [...notes,
-            {
-                id: noteId = setNoteId(notes),
-                markDown: '',
-                date: new Date()
-            }])
+        const noteId = setNoteId(notes)
+        setNotes((notes) => {
+            return [...notes,
+                {
+                    id: noteId,
+                    markDown: '',
+                    date: new Date()
+                }]
+        })
         setCurrentNoteId(noteId)
+        setSearchString('');
 
     }
 
@@ -41,6 +44,11 @@ const ToolBar = () => {
         setNotes(notes => {
             return notes.filter(note => note.id !== currentNoteId)
         })
+    }
+
+    const changeSearchString = (event) => {
+        setCurrentNoteId(null)
+        setSearchString(event.target.value)
     }
 
     return (
@@ -71,7 +79,12 @@ const ToolBar = () => {
                     </div>
                     <div className={styles.search}>
                         <img src={searchIcon} alt={'search in notes'}/>
-                        <input type={'text'} className={styles.search__input}/>
+                        <input
+                            type={'text'}
+                            className={styles.search__input}
+                            onChange={changeSearchString}
+                            value={searchString}
+                        />
                     </div>
                 </div>
             </div>

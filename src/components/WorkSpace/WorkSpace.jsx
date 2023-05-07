@@ -14,7 +14,7 @@ const WorkSpace = () => {
             specialText += '   '
         }
         if (specialKey === 'enter'){
-            specialText += '\n\n'
+            specialText += '\n'
         }
         setNotes(notes => {
             return notes.map(note => {
@@ -26,7 +26,7 @@ const WorkSpace = () => {
         })
     }
 
-    const ifTabEvent = (event) => {
+    const SpecialKeyPressHandler = (event) => {
         if (event.keyCode === 9) {
             event.preventDefault()
             changeArea(event, 'tab')
@@ -42,7 +42,7 @@ const WorkSpace = () => {
             ' - ' +
             date.getHours() +
             ':' +
-            (date.getMinutes().length === 1 ? '0' + date.getMinutes() : date.getMinutes())
+            (date.getMinutes().toString().length === 1 ? '0' + date.getMinutes() : date.getMinutes())
     }
 
     return (
@@ -54,8 +54,8 @@ const WorkSpace = () => {
                         value={currentNote.markDown}
                         placeholder={'|<-'}
                         disabled={!isEditMode}
+                        onKeyDown={SpecialKeyPressHandler}
                         onChange={changeArea}
-                        onKeyDown={ifTabEvent}
                     >
 
                     </textarea>

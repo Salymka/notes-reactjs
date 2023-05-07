@@ -1,4 +1,5 @@
 import React, {createContext, useEffect, useState} from "react";
+import {logDOM} from "@testing-library/react";
 
 export const NotesContext = createContext({});
 export const NotesProvider = ({children}) => {
@@ -8,15 +9,17 @@ export const NotesProvider = ({children}) => {
     const [searchString, setSearchString] = useState('')
 
     useEffect(() => {
-        setIsEditMode(false)
+        if(isEditMode){
+            setIsEditMode(false)
+        }
     }, [currentNoteId])
 
     useEffect(() => {
-        setSearchString('')
         if(currentNoteId){
             setIsEditMode(true)
         }
     }, [notes])
+
 
     return (
         <NotesContext.Provider
@@ -26,7 +29,9 @@ export const NotesProvider = ({children}) => {
                 currentNoteId,
                 setCurrentNoteId,
                 isEditMode,
-                setIsEditMode
+                setIsEditMode,
+                searchString,
+                setSearchString
             }}>
             {children}
         </NotesContext.Provider>
