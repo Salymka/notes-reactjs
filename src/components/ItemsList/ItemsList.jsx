@@ -1,18 +1,17 @@
 import React, {useContext} from 'react';
 import styles from './ItemsList.module.scss'
 import {NotesContext} from "../../notesContext";
-import {logDOM} from "@testing-library/react";
 
 const ItemsList = () => {
     const {notes, currentNoteId, setCurrentNoteId, setIsEditMode, searchString} = useContext(NotesContext)
-    const filteredNotes = notes.filter(note => note.markDown.toLowerCase().includes(searchString.toLowerCase()))
+    const filteredNotes = notes.filter(note => note?.markDown.toLowerCase().includes(searchString.toLowerCase()))
 
     const formatTitle = (markDownText, item) => {
         const splitForParagraph = markDownText.split('\n')[0];
         if (splitForParagraph.length === 0)
             return "Empty note";
-        if (splitForParagraph.length > 25) {
-            return splitForParagraph.slice(0, 22) + '...';
+        if (splitForParagraph.length > 14) {
+            return splitForParagraph.slice(0, 13) + '...';
         }
         return splitForParagraph;
     }
@@ -21,8 +20,8 @@ const ItemsList = () => {
         const splitForParagraph = markDownText.split('\n')[1] || markDownText.split('\n')[0];
         if (splitForParagraph.length === 0)
             return "";
-        if (splitForParagraph.length > 30) {
-            return splitForParagraph.slice(0, 27) + '...';
+        if (splitForParagraph.length > 24) {
+            return splitForParagraph.slice(0, 22) + '...';
         }
         return splitForParagraph;
     }

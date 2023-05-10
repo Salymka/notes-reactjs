@@ -8,42 +8,31 @@ import searchIcon from '../../static/search-icon.png'
 import {NotesContext} from "../../notesContext";
 
 const ToolBar = () => {
-    const {currentNoteId, notes, setIsEditMode, setNotes, setCurrentNoteId, setSearchString, searchString} = useContext(NotesContext)
+    const {
+        currentNoteId,
+        addNewNote,
+        deleteNote,
+        setIsEditMode,
+        setCurrentNoteId,
+        setSearchString,
+        searchString
+    } = useContext(NotesContext)
     const editModeHandler = () => {
-        setIsEditMode(true)
+        setIsEditMode(true);
     }
 
-    const setNoteId = (notes) => {
-        let maxId = 0;
-        notes.forEach(note => {
-            if(note.id > maxId){
-                maxId = note.id
-            }
-        })
-        return maxId + 1;
-    }
-
-
-    const addNewNote = () => {
-        const noteId = setNoteId(notes)
-        setNotes((notes) => {
-            return [...notes,
-                {
-                    id: noteId,
-                    markDown: '',
-                    date: new Date()
-                }]
-        })
-        setCurrentNoteId(noteId)
+    const addNewNoteAndSetCurrent = async () => {
         setSearchString('');
-
+        await addNewNote();
     }
 
-    const deleteCurrentNote = () => {
+    const deleteCurrentNote = async () => {
+        let deleteConfirm = window.confirm('Delete this note?');
+        if(!deleteConfirm){
+            return;
+        }
         setCurrentNoteId(null)
-        setNotes(notes => {
-            return notes.filter(note => note.id !== currentNoteId)
-        })
+        await deleteNote(currentNoteId);
     }
 
     const changeSearchString = (event) => {
@@ -58,7 +47,7 @@ const ToolBar = () => {
                     <div className={styles.toolbar__tools}>
                         <button
                             className={`${styles.toolBtn}`}
-                            onClick={addNewNote}
+                            onClick={addNewNoteAndSetCurrent}
                         >
                             <img src={addIcon} alt={'add note'}/>
                         </button>

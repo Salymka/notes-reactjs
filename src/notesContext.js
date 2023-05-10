@@ -1,25 +1,131 @@
 import React, {createContext, useEffect, useState} from "react";
-import {logDOM} from "@testing-library/react";
+import {v4 as uuidv4} from 'uuid';
+//DcU8o5isDoW75VW4LlW4v8
+import {
+    addIndexedDBItem,
+    deleteIndexedDBItem,
+    getAllIndexedDBItems,
+    initIndexedDB,
+    updateIndexedDBItem
+} from "./indexeddb/indexedDBService";
+
+import QuantaDBService, {configuration} from "./api/QuantaDBService";
+import {useLocalStorage} from "./hooks/useLocalStorage";
+
 
 export const NotesContext = createContext({});
+
 export const NotesProvider = ({children}) => {
     const [notes, setNotes] = useState([]);
     const [currentNoteId, setCurrentNoteId] = useState(null)
     const [isEditMode, setIsEditMode] = useState(false)
     const [searchString, setSearchString] = useState('')
+    const currentNote = currentNoteId
+        ? notes.find(note => note.id === currentNoteId)
+        : null;
+    const [user, setUser] = useLocalStorage("Notes-User")
+    const [isDBReady, setIsDBReady] = useState((!(user && user.saveType === 'db')));
+
+    if (!user) {
+        const user = {};
+        const saveService = prompt('You can choose save service:\n1 - indexeddb(default)\n2 - Quintadb', '1')
+        if (saveService === '1') {
+            user.saveType = "db"
+        }
+        if (saveService === '2') {
+            user.saveType = "restApi"
+        }
+        user.userName = uuidv4()
+        setUser(user)
+    }
+
+    const setNewNoteId = (length = 22) => {
+        let id = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz-0123456789';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+            id += characters.charAt(Math.floor(Math.random() * charactersLength));
+            counter += 1;
+        }
+        return id;
+    }
+    const handleInit = async () => {
+        if (!isDBReady) {
+            const status = await initIndexedDB();
+            setIsDBReady(status);
+        }
+        await getAllNotes()
+    };
 
     useEffect(() => {
-        if(isEditMode){
+        handleInit().then()
+    }, [])
+
+    useEffect(() => {
+        if (isEditMode) {
             setIsEditMode(false)
         }
     }, [currentNoteId])
 
     useEffect(() => {
-        if(currentNoteId){
+        if (currentNoteId) {
             setIsEditMode(true)
         }
     }, [notes])
 
+    const toCorrectFormat = (noteData) => {
+        if (user.saveType === "db") {
+            return noteData.map((note) => {
+                const {id, markDown, date} = note;
+                return {id, markDown, date}
+            })
+        }
+        if (user.saveType === "restApi") {
+            return noteData.records.map((note) => {
+                const {id, values, updated_at} = note;
+                return {
+                    id,
+                    markDown: (values[configuration.markDown] ? values[configuration.markDown] : ''),
+                    date: new Date(updated_at)
+                }
+            })
+        } else return []
+    }
+
+    const getAllNotes = async () => {
+        if (user) {
+            const notes = user.saveType === 'db'
+                ? await getAllIndexedDBItems()
+                : await QuantaDBService.getQuantaAllNotes(user.userName)
+            const formattedNotes = toCorrectFormat(notes)
+            setNotes(formattedNotes)
+        }
+    }
+    const addNewNote = async () => {
+        const newNoteId = setNewNoteId();
+        const newNote = {id: newNoteId, markDown: "", date: new Date()}
+        const updateNote = user.saveType === 'db'
+            ? await addIndexedDBItem(newNote)
+            : await QuantaDBService.addQuantaNewNote(user.userName, newNoteId)
+        await setCurrentNoteId(newNoteId)
+        await getAllNotes()
+    }
+
+    const updateNote = async (id, markDown) => {
+        const updatedNote = {id, markDown, date: new Date()};
+        const notes = user.saveType === 'db'
+            ? await updateIndexedDBItem(updatedNote)
+            : await QuantaDBService.updateQuantaNote(currentNoteId, markDown)
+        await getAllNotes()
+    }
+
+    const deleteNote = async (id) => {
+        const notes = user.saveType === 'db'
+            ? await deleteIndexedDBItem(id)
+            : await QuantaDBService.deleteQuantaNote(currentNoteId)
+        await getAllNotes()
+    }
 
     return (
         <NotesContext.Provider
@@ -31,9 +137,14 @@ export const NotesProvider = ({children}) => {
                 isEditMode,
                 setIsEditMode,
                 searchString,
-                setSearchString
+                setSearchString,
+                getAllNotes,
+                addNewNote,
+                updateNote,
+                deleteNote,
+                currentNote
             }}>
-            {children}
+            {isDBReady && children}
         </NotesContext.Provider>
     );
 };
