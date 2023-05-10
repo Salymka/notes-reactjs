@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/notes-reactjs/static/css/main.6fbf79f9.css",
+    "main.js": "/notes-reactjs/static/js/main.e123b1a9.js",
+    "index.html": "/notes-reactjs/index.html",
+    "main.6fbf79f9.css.map": "/notes-reactjs/static/css/main.6fbf79f9.css.map",
+    "main.e123b1a9.js.map": "/notes-reactjs/static/js/main.e123b1a9.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.6fbf79f9.css",
+    "static/js/main.e123b1a9.js"
+  ]
+}
