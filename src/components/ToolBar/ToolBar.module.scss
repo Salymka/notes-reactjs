@@ -15,13 +15,24 @@
   align-items: center;
   height: 80px;
 
+  @media ((max-width: 760px)) {
+    height: 115px;
+    display: block;
+
+  }
+
 }
 
 .toolbar__tools {
   display: flex;
   max-width: max-content;
 
+  @media ((max-width: 760px)) {
+    padding-top: 10px;
+    margin: 0 auto;
+  }
 }
+
 .toolBtn {
 
   width: 60px;
@@ -64,6 +75,12 @@
     width: 35px;
     height: 35px;
   }
+
+  @media ((max-width: 760px)) {
+    margin-top: 10px;
+
+  }
+
 }
 
 .search__input {

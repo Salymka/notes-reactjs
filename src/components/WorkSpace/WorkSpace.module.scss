@@ -3,6 +3,12 @@
   background: whitesmoke;
   width: calc(100% / 3 * 2);
   height: 100%;
+
+  @media ((max-width: 760px)) {
+    width: 100%;
+    height: calc(100% - 110px);
+
+  }
 }
 .workspace__wrapper {
   position: relative;

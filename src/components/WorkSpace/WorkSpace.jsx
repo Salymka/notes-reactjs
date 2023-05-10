@@ -1,9 +1,9 @@
-import React, {useContext, useEffect, useRef} from 'react';
+import React, {useContext, useRef} from 'react';
 import styles from './WorkSpace.module.scss'
 import {NotesContext} from "../../notesContext";
 
 const WorkSpace = () => {
-    const {currentNoteId, currentNote, isEditMode, updateNote, setNotes, notes} = useContext(NotesContext)
+    const {currentNoteId, currentNote, isEditMode, updateNote, setNotes} = useContext(NotesContext)
     const timer = useRef(null)
 
     // Remember the latest callback if it changes.
